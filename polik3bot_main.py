@@ -70,15 +70,17 @@ def hello_world(update,  context):
 def error(update, context):
     """Log Errors caused by Updates."""
     print('error')
-    print(update, context.error)
+    print(update)
+    print(context.error)
+
 
 def handle_text(update, context):
-    cur_chat=update['message']['chat']['id']
+    cur_chat = update['message']['chat']['id']
     if check_telegram_client(update['message']['chat']['id'], update):
         if update['message']['text'].startswith('/tadd'):
-            message_list=update['message']['text'].split(' ')[1:]
+            message_list = update['message']['text'].split(' ')[1:]
             name_ticket = ' '.join(message_list)
-            if not name_ticket is None and name_ticket.strip() != '':
+            if name_ticket is not None and name_ticket.strip() != '':
                 base_url = 'http://polik3.local/glpi/apirest.php/'
                 app_token = ''
 
