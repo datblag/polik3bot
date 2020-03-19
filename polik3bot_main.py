@@ -100,27 +100,32 @@ def handle_text(update, context):
                     args = None
                     item_type = 'ticket'
                     if args is None:
-                        target_url = item_type + '/'
+                        target_url = item_type + '/190/ticket_user/'
                     else:
                         target_url = item_type + '/' + '?' + args
                     sessiondata = {'Content-Type': 'application/json',
                                    'Session-Token': session_token, 'App-Token': app_token}
-                    session = get(base_url + target_url, headers=sessiondata)
+                    session = post(base_url + target_url, headers=sessiondata, json={"input": {'tickets_id': 190, 'users_id': 7, 'type': 2}})
+                    print(session.json())
                     for ticket in session.json():
+                        continue
                         print(ticket)
 
+                    item_type = 'ticket'
                     target_url = item_type+'/'
                     sessiondata = {'Content-Type': 'application/json',
                                    'Session-Token': session_token, 'App-Token': app_token}
                     session = post(base_url + target_url, headers=sessiondata, json={"input": {"name": name_ticket,
-                                   'users_id_recipient': None, 'content': name_ticket, 'itilcategories_id': 1}})
+                                   'users_id_recipient': 7, 'content': name_ticket, 'itilcategories_id': 1}})
                     update.message.reply_text(session.json()['message'])
 
                     target_url = item_type+'/'+str(session.json()['id'])
                     print(target_url)
                     sessiondata = {'Content-Type': 'application/json',
                                    'Session-Token': session_token, 'App-Token': app_token}
-                    session = put(base_url + target_url, headers=sessiondata, json={"input": {'status': 1}})
+                    session = put(base_url + target_url, headers=sessiondata, json={"input": {'users_id_recipient': 7}})
+                    # session = put(base_url + target_url, headers=sessiondata, json={"input": {'status': 1,
+                    #               'users_id_recipient': 7}})
 
                     target_url = 'killSession'
                     sessiondata = {'Content-Type': 'application/json',
