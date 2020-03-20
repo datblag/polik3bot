@@ -1,66 +1,10 @@
-from os.path import curdir
-
 from telegram.ext import Updater, CommandHandler, MessageHandler
-from bot_config import TOKEN, REQUEST_KWARGS, QSYSTEM_ADDRESS, TELECRAM_CLIENT_WHITE_LIST, TELEGRAM_GLPI_LIST
+from bot_config import BOT_TOKEN, REQUEST_KWARGS, QSYSTEM_ADDRESS, TELEGRAM_GLPI_LIST
 import socket
 from requests import post, get, put, delete
 import json
-
-
-def check_telegram_client(prm_chat_id, prm_update):
-    if not prm_chat_id in TELECRAM_CLIENT_WHITE_LIST:
-        print('''sorry it's private bot''')
-        prm_update.message.reply_text('''sorry it's private bot''')
-        return False
-    else:
-        return True
-
-
-def terminal_lock(update, context):
-    if check_telegram_client(update['message']['chat']['id'],update):
-        sock = socket.socket()
-        sock.connect(QSYSTEM_ADDRESS)
-        sock.send(b'{"params":{"drop_tickets_cnt":false},"jsonrpc":"2.0","id":"1570405953995","method":"#WELCOME_LOCK#"}')
-        data = sock.recv(1024)
-        data2 = json.loads(data.decode("cp1251"))
-        print(data2)
-        sock.close()
-        update.message.reply_text(data2['result'])
-
-
-def terminal_reset(update, context):
-    if check_telegram_client(update['message']['chat']['id'],update):
-        sock = socket.socket()
-        sock.connect(QSYSTEM_ADDRESS)
-        sock.send(b'{"params":{"drop_tickets_cnt":true},"jsonrpc":"2.0","id":"1570405953995","method":"#WELCOME_REINIT#"}')
-        data = sock.recv(1024)
-        data2 = json.loads(data.decode("cp1251"))
-        print(data2)
-        sock.close()
-        update.message.reply_text(data2['result'])
-
-
-def terminal_unlock(update,  context):
-    if check_telegram_client(update['message']['chat']['id'], update):
-        sock = socket.socket()
-        sock.connect(QSYSTEM_ADDRESS)
-        sock.send(b'{"params":{"drop_tickets_cnt":false},"jsonrpc":"2.0","id":"1570405953995","method":"#WELCOME_UNLOCK#"}')
-        data = sock.recv(1024)
-        data2 = json.loads(data.decode("cp1251"))
-        print(data2)
-        sock.close()
-        update.message.reply_text(data2['result'])
-
-def talon(update, context):
-    if check_telegram_client(update['message']['chat']['id'],update):
-        sock = socket.socket()
-        sock.connect(QSYSTEM_ADDRESS)
-        sock.send(b'{"params":{"drop_tickets_cnt":false},"jsonrpc":"2.0","id":"1570170084856","method":"Empty"}')
-        data = sock.recv(1024)
-        data2 = json.loads(data.decode("cp1251"))
-        print(data2)
-        sock.close()
-        update.message.reply_text(data2['result'])
+from dat_telegram import check_telegram_client
+from qsystem import terminal_lock, terminal_reset, terminal_unlock, talon
 
 
 def hello_world(update,  context):
@@ -159,8 +103,8 @@ def main():
     data2 = json.loads(data.decode("cp1251"))
     print(data2)
 
-    updater = Updater(TOKEN, use_context=True)
-    # updater = Updater(TOKEN, use_context=True, request_kwargs=REQUEST_KWARGS)
+    # updater = Updater(BOT_TOKEN, use_context=True)
+    updater = Updater(BOT_TOKEN, use_context=True, request_kwargs=REQUEST_KWARGS)
 
     dp = updater.dispatcher
 
