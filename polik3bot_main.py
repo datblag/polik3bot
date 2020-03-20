@@ -1,23 +1,34 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler
-from bot_config import BOT_TOKEN, REQUEST_KWARGS, QSYSTEM_ADDRESS, TELEGRAM_GLPI_LIST
-import socket
+from bot_config import BOT_TOKEN, REQUEST_KWARGS, TELEGRAM_GLPI_LIST
 from requests import post, get, put, delete
-import json
 from dat_telegram import check_telegram_client
-from qsystem import terminal_lock, terminal_reset, terminal_unlock, talon
+import qsystem
+import logging
+from dat_glpi import init_session
+
+
+def terminal_lock(update, context):
+    if check_telegram_client(update['message']['chat']['id'], update):
+        res_message = qsystem.terminal_lock()
+        update.message.reply_text(res_message)
+
+
+def talon(update, context):
+    if check_telegram_client(update['message']['chat']['id'],update):
+        res_message = qsystem.talon()
+        update.message.reply_text(res_message)
 
 
 def hello_world(update,  context):
     if check_telegram_client(update['message']['chat']['id'], update):
-        print('hi. i work')
+        logging.info('hi. i work')
         update.message.reply_text('hi. i work')
 
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    print('error')
-    print(update)
-    print(context.error)
+    logging.error(update)
+    logging.error(context.error)
 
 
 def handle_text(update, context):
@@ -88,20 +99,7 @@ def help(update, context):
 
 
 def main():
-    # sock = socket.socket()
-    # sock.connect(QSYSTEM_ADDRESS)
-    # sock.send(b'{"params":{"drop_tickets_cnt":true},"jsonrpc":"2.0","id":"1570405953995","method":"#WELCOME_REINIT#"}')
-    # data = sock.recv(1024)
-    # data2 = json.loads(data.decode("cp1251"))
-    # print(data2)
-    # sock.close()01011960
-
-    sock = socket.socket()
-    sock.connect(QSYSTEM_ADDRESS)
-    sock.send(b'{"params":{"drop_tickets_cnt":false},"jsonrpc":"2.0","id":"1570170084856","method":"Empty"}')
-    data = sock.recv(1024)
-    data2 = json.loads(data.decode("cp1251"))
-    print(data2)
+    qsystem.talon()
 
     # updater = Updater(BOT_TOKEN, use_context=True)
     updater = Updater(BOT_TOKEN, use_context=True, request_kwargs=REQUEST_KWARGS)
@@ -115,7 +113,7 @@ def main():
     dp.add_handler(CommandHandler("r", terminal_reset))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(None, handle_text))
-    print('bot start')
+    logging.info('bot start')
 
     dp.add_error_handler(error)
     updater.start_polling()
