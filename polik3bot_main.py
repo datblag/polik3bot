@@ -2,6 +2,7 @@ import logs
 from telegram.ext import Updater, CommandHandler, MessageHandler
 from bot_config import BOT_TOKEN, REQUEST_KWARGS
 from bot_config import QLPI_API_BASE_URL
+from bot_config import CABINET_KEY
 from requests import post, get, put, delete
 from dat_telegram import check_telegram_client
 import qsystem
@@ -78,6 +79,28 @@ def handle_text(update, context):
                     update.message.reply_text('пользователь не авторизирован')
             else:
                 update.message.reply_text('ошибка не указан заголовок тикета')
+        elif update['message']['text'].startswith('/cabinet'):
+            try:
+                cabinet = update['message']['text'].split(' ')[1:][0]
+                if cabinet.isdigit():
+                    cabinet_prefix = ''
+                    if int(cabinet) < 200:
+                        cabinet_prefix = 'a'
+                        cabinet = cabinet[1:]
+                    elif int(cabinet) < 300:
+                        cabinet_prefix = 'b'
+                        cabinet = cabinet[1:]
+                    elif int(cabinet) < 400:
+                        cabinet_prefix = 'c'
+                        cabinet = cabinet[1:]
+                    elif int(cabinet) < 500:
+                        cabinet_prefix = 'd'
+                        cabinet = cabinet[1:]
+
+                    cabinet = ''.join([cabinet_prefix, cabinet, CABINET_KEY])
+                    update.message.reply_text(cabinet)
+            except:
+                update.message.reply_text('ошибка')
 
 
 def help(update, context):
